@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">My Application 2</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="todo" />
+    <string name="dashboard">Dashboard</string>
+    <string name="add">Add</string>
+    <string name="profile">Profile</string>
+    <string name="mary376">MARY376</string>
+    <string name="_34">34</string>
+    <string name="budget_status">Budget Status</string>
+    <string name="good">Good.</string>
+    <string name="you_ve_saved_10_of_your_budget_this_month">You\'ve saved 10% of your budget this month.</string>
+    <string name="left_to_spend">Left to spend</string>
+    <string name="r4388_79">R4388,79</string>
+    <string name="monthly_budget">Monthly budget</string>
+    <string name="r12_500_00">R12,500.00</string>
+    <string name="you_mainly_spend_money_on_food">You mainly spend money on FOOD</string>
+    <string name="more_actions">MORE ACTIONS:</string>
+    <string name="categories">Categories</string>
+    <string name="set_goal">Set Goal</string>
+    <string name="breakdown">Breakdown</string>
+    <string name="expense_history">Expense History</string>
+    <string name="user">User</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="master_your_money_own_your_future">Master your money, own your future</string>
+    <string name="track_save_and_grow_with_wealthwhiz">Track, Save and Grow with WealthWhiz!</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="create_account">Create Account</string>
+    <string name="first_name">First Name</string>
+    <string name="email_address">Email Address</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_an_account_sign_in">Already have an account? Sign In</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="don_t_have_an_account_sign_up">Don\'t have an account? Sign Up</string>
+    <string name="log_in">Log In</string>
+    <string name="close">Close</string>
+    <string name="full_name">Full Name</string>
+
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="material_dynamic_primary10">#6200EE</color> <!-- Deep Purple -->
+    <color name="material_dynamic_neutral50">#03DAC5</color> <!-- Teal -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="budget_over">#FFE53935</color>
+    <color name="budget_warning">#FFFB8C00</color>
+    <color name="budget_good">#FF43A047</color>
+    <color name="budget_not_set">#FF757575</color>
+</resources>
