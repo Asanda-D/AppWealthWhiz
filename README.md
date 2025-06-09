@@ -91,7 +91,7 @@ User Profiles – Secure login and personalization
 
 Clone the repository:
 
--git clone https://github.com/Asanda-D/WealthWhizApplication.git
+-git clone https://github.com/Asanda-D/AppWealthWhiz.git
 -Open the project in Android Studio.
 -Add your Firebase configuration file:
 -Download your google-services.json file from the Firebase Console.
@@ -106,6 +106,7 @@ Icons by Icons8
 Demo video: https://youtu.be/2ZefLaHZXck?si=KUXf8Y5IO4BmnexU
 
 ## Contributors
+
 Asanda Dimba
 
 Kiera Meth
