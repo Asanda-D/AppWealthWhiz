@@ -26,13 +26,16 @@ jobs:
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./WealthWhiz-master/gradlew
+        run: chmod +x ./gradlew
+        working-directory: WealthWhiz-master
 
       - name: Build with Gradle
-        run: ./WealthWhiz-master/gradlew build
+        run: ./gradlew build
+        working-directory: WealthWhiz-master
 
       - name: Run Debug Unit Tests
-        run: ./WealthWhiz-master/gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest
+        working-directory: WealthWhiz-master
 
       - name: Upload Test Reports
         if: always()
