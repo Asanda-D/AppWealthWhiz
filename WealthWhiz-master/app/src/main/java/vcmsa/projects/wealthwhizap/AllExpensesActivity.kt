@@ -1,7 +1,9 @@
 package vcmsa.projects.wealthwhizap
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
@@ -12,12 +14,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import vcmsa.projects.wealthwhizap.databinding.ActivityAllExpensesBinding
+import vcmsa.projects.wealthwhizap.databinding.ActivityManageCategoriesBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickListener,
     ExpenseAdapter.OnItemClickListener {
 
+    private lateinit var binding: ActivityAllExpensesBinding
     private lateinit var tvCurrentMonth: TextView
     private lateinit var btnLast7Days: Button
     private lateinit var btnSortByCost: Button
@@ -33,7 +38,14 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_all_expenses)
+        binding = ActivityAllExpensesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Setup toolbar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = "       \t\t\tALL EXPENSES"
 
         // Initialize views
         tvCurrentMonth = findViewById(R.id.tvMonth)
@@ -55,7 +67,17 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
 
         // Load data
         loadCategories()
-        fetchExpensesForMonth(selectedMonth)
+
+        val intentCategoryId = intent.getStringExtra("FILTER_CATEGORY_ID")
+        val intentMonth = intent.getStringExtra("FILTER_MONTH")
+
+        if (!intentCategoryId.isNullOrEmpty() && !intentMonth.isNullOrEmpty()) {
+            selectedMonth = intentMonth
+            tvCurrentMonth.text = selectedMonth
+            fetchExpensesForMonth(selectedMonth, intentCategoryId)
+        } else {
+            fetchExpensesForMonth(selectedMonth)
+        }
 
         // Setup click listeners
         btnLast7Days.setOnClickListener {
@@ -81,7 +103,6 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
 
     override fun onResume() {
         super.onResume()
-        // Refresh data when returning from other activities
         loadCategories()
         fetchExpensesForMonth(selectedMonth)
     }
@@ -95,7 +116,6 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
                         categoriesMap = categories.associateBy { it.id }
                         expenseAdapter.updateCategories(categoriesMap)
 
-                        // Verify all expenses have valid categories
                         val invalidExpenses = expensesList.filter { expense ->
                             !categoriesMap.containsKey(expense.categoryId)
                         }
@@ -169,40 +189,35 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
         fetchExpensesForMonth(selectedMonth)
     }
 
-    private fun fetchExpensesForMonth(month: String) {
+    private fun fetchExpensesForMonth(month: String, filterCategoryId: String? = null) {
         lifecycleScope.launch {
             try {
                 val username = getCurrentUserUsername()
                 firebaseManager.getExpenses(username).fold(
                     onSuccess = { expenses ->
-                        // Sort expenses by date in descending order
                         val sortedExpenses = expenses.sortedByDescending { expense ->
                             try {
-                                val date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                                    .parse(expense.dateTime)
+                                val date = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(expense.dateTime)
                                 date?.time ?: 0L
                             } catch (e: Exception) {
                                 0L
                             }
                         }
 
-                        // Filter expenses for the selected month
                         expensesList = sortedExpenses.filter { expense ->
                             try {
-                                val expenseDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                                    .parse(expense.dateTime.split(" ")[0]) ?: return@filter false
-                                val expenseMonth = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-                                    .format(expenseDate)
-                                expenseMonth == month
+                                val expenseDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(expense.dateTime.split(" ")[0]) ?: return@filter false
+                                val expenseMonth = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(expenseDate)
+                                val sameMonth = expenseMonth == month
+                                val sameCategory = filterCategoryId?.let { expense.categoryId == it } ?: true
+                                sameMonth && sameCategory
                             } catch (e: Exception) {
                                 false
                             }
                         }
 
-                        // Update the adapter with the filtered and sorted expenses
                         expenseAdapter.updateExpenses(expensesList)
 
-                        // Show a message if no expenses are found
                         if (expensesList.isEmpty()) {
                             Toast.makeText(this@AllExpensesActivity, "No expenses found for $month", Toast.LENGTH_SHORT).show()
                         }
@@ -250,6 +265,16 @@ class AllExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickList
             } catch (e: Exception) {
                 Toast.makeText(this@AllExpensesActivity, "Error filtering expenses: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

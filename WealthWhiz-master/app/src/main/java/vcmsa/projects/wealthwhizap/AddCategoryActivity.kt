@@ -2,9 +2,14 @@ package vcmsa.projects.wealthwhizap
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import vcmsa.projects.wealthwhizap.databinding.ActivityAddCategoryBinding
@@ -24,7 +29,8 @@ class AddCategoryActivity : AppCompatActivity() {
         // Setup toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Add Category"
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = "       \t\t\tADD CATEGORY"
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
@@ -116,6 +122,9 @@ class AddCategoryActivity : AppCompatActivity() {
             R.drawable.ic_outings,
             R.drawable.ic_heart,
             R.drawable.ic_hobbies,
+            R.drawable.ic_gift,
+            R.drawable.ic_world,
+            R.drawable.ic_home,
             R.drawable.ic_entertainment
         )
 
@@ -147,8 +156,8 @@ class AddCategoryActivity : AppCompatActivity() {
 
     private fun showColorPickerDialog() {
         val colors = listOf(
-            "#FFC107", "#03A9F4", "#8BC34A", "#FF5722", "#9C27B0",
-            "#4CAF50", "#E91E63", "#009688", "#FF9800", "#607D8B"
+            "#FFC107", "#03A9F4", "#8BC34A", "#FF5722", "#9C27B0", "#996500", "#D80000", "#C6D9C8",
+            "#4CAF50", "#E91E63", "#009688", "#FF9800", "#607D8B", "#F5B6CB", "#5C311F", "#BFCAD9"
         )
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_color_picker, null)

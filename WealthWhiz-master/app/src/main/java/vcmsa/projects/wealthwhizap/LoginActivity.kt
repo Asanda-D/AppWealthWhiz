@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
                             finish()
                         },
                         onFailure = { e ->
-                            Toast.makeText(this@LoginActivity, "Invalid username or password", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "Login failed: ${e.message}", Toast.LENGTH_LONG).show()
                         }
                     )
                 } catch (e: Exception) {

@@ -2,6 +2,7 @@ package vcmsa.projects.wealthwhizap
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.coroutines.launch
+import vcmsa.projects.wealthwhizap.databinding.ActivityCategoryExpensesBinding
+import vcmsa.projects.wealthwhizap.databinding.ActivityManageCategoriesBinding
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,6 +22,7 @@ import java.util.*
 class CategoryExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClickListener,
     ExpenseAdapter.OnItemClickListener {
 
+    private lateinit var binding: ActivityCategoryExpensesBinding
     private lateinit var totalAmountTextView: TextView
     private lateinit var expensesRecyclerView: RecyclerView
     private lateinit var dateRangeTextView: TextView
@@ -42,12 +46,14 @@ class CategoryExpensesActivity : AppCompatActivity(), ExpenseAdapter.OnImageClic
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_category_expenses)
+        binding = ActivityCategoryExpensesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Setup toolbar
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Category Expenses"
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = "  \t\t\tCATEGORY EXPENSES"
 
         sharedPreferences = getSharedPreferences("WealthWhizPrefs", MODE_PRIVATE)
 

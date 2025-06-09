@@ -10,12 +10,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import android.view.View
 
+//All Referencing is available on GROUP_5_PROG7313_POE_PART_3 pdf
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -37,6 +40,10 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var imgExpenses: ImageView
     private lateinit var imgUser: ImageView
     private lateinit var imgAddExpense: ImageView
+    private lateinit var imgBadgeIcon: ImageView
+
+    // New: streak and badge views
+    private lateinit var txtStreak: TextView
 
     private val firebaseManager = FirebaseManager(this)
 
@@ -50,11 +57,26 @@ class DashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
+
+
+        val currentStreakTextView = findViewById<TextView>(R.id.currentStreak)
+
+        lifecycleScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                val result = FirebaseManager.getCurrentStreak(uid)
+                result.onSuccess { streak ->
+                    currentStreakTextView.text = "$streak Day Streak"
+                }.onFailure {
+                    currentStreakTextView.text = "0 Day Streak"  // fallback
+                }
+            }
+        }
+
+
         // Top bar
         imgProfile = findViewById(R.id.image)
         txtUsername = findViewById(R.id.user)
-        imgCoin = findViewById(R.id.imageView7)
-        txtCoins = findViewById(R.id.textViewCoins)
         imgSettings = findViewById(R.id.imageView9)
 
         // Budget fields
@@ -72,6 +94,10 @@ class DashboardActivity : AppCompatActivity() {
         imgExpenses = findViewById(R.id.imageView14)
         imgUser = findViewById(R.id.imageView15)
         imgAddExpense = findViewById(R.id.imageView)
+        imgBadgeIcon = findViewById(R.id.badges_icon)
+
+        // New: bind streak 
+        txtStreak = findViewById(R.id.currentStreak)
 
         // Set username from SharedPreferences
         val sharedPref = getSharedPreferences("WealthWhizPrefs", MODE_PRIVATE)
@@ -100,7 +126,7 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, GoalActivity::class.java))
         }
         imgBreakdown.setOnClickListener {
-            Toast.makeText(this, "Breakdown feature coming soon!", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, MonthlyBreakdownActivity::class.java))
         }
         imgExpenses.setOnClickListener {
             startActivity(Intent(this, AllExpensesActivity::class.java))
@@ -111,12 +137,44 @@ class DashboardActivity : AppCompatActivity() {
         imgAddExpense.setOnClickListener {
             startActivity(Intent(this, AddExpenseActivity::class.java))
         }
+        imgBadgeIcon.setOnClickListener {
+            startActivity(Intent(this, BadgesActivity::class.java))
+        }
+        imgSettings.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
     }
 
     override fun onResume() {
         super.onResume()
         updateBudgetAndExpenses()
+
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        val uid = currentUser.uid
+
+        lifecycleScope.launch {
+            // Update the login streak
+            firebaseManager.updateLoginStreakOnAppOpen(uid).fold(
+                onSuccess = { newStreak ->
+                    txtStreak.text = "$newStreak Day Streak"
+                },
+                onFailure = { e ->
+                    Log.e("DashboardActivity", "Streak update failed: ${e.message}")
+                }
+            )
+
+            // Optionally fetch and re-confirm the current streak
+            firebaseManager.getCurrentStreak(uid).fold(
+                onSuccess = { streak ->
+                    txtStreak.text = "$streak Day Streak"
+                },
+                onFailure = {
+                    Log.e("DashboardActivity", "Failed to get streak: ${it.message}")
+                }
+            )
+        }
     }
+
 
     private fun updateBudgetAndExpenses() {
         lifecycleScope.launch {

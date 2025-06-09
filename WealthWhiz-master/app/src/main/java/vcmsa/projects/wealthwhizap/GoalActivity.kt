@@ -2,8 +2,10 @@ package vcmsa.projects.wealthwhizap
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -15,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import vcmsa.projects.wealthwhizap.databinding.ActivityGoalBinding
+import vcmsa.projects.wealthwhizap.databinding.ActivityManageCategoriesBinding
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -22,6 +26,7 @@ import java.util.Locale
 
 class GoalActivity : AppCompatActivity(), GoalAdapter.OnGoalClickListener {
 
+    private lateinit var binding: ActivityGoalBinding
     private lateinit var spinnerMonth: Spinner
     private lateinit var editTextMinGoal: EditText
     private lateinit var editTextMaxGoal: EditText
@@ -53,7 +58,14 @@ class GoalActivity : AppCompatActivity(), GoalAdapter.OnGoalClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_goal)
+        binding = ActivityGoalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Setup toolbar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = " \t\t\tSET BUDGET GOAL"
 
         // Initialize views
         spinnerMonth = findViewById(R.id.spinnerMonth)
@@ -268,6 +280,16 @@ class GoalActivity : AppCompatActivity(), GoalAdapter.OnGoalClickListener {
         editTextMaxGoal.text.clear()
         editTextBudget.text.clear()
         spinnerMonth.setSelection(0)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun getCurrentUserUsername(): String {

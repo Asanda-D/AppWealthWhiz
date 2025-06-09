@@ -8,15 +8,18 @@
     <!-- Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#000D87"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            android:background="#F4F6F8"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextAppearance="@style/ToolbarTitleBold" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -25,72 +28,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:padding="14dp">
+        android:padding="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:paddingBottom="40dp">
 
-            <!-- Name Card -->
+            <!-- Info Card Template -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginBottom="30dp"
-                android:backgroundTint="@android:color/white"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#CCCCCC"
-                android:padding="18dp">
+                style="@style/CardStyle"
+                android:layout_marginBottom="20dp">
 
                 <TextView
                     android:id="@+id/tvName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Name:"
-                    android:textSize="22sp"
-                    android:textColor="#424242" />
+                    style="@style/InfoTextStyle"
+                    android:text="Name: "
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"/>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Email Card -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginBottom="30dp"
-                android:backgroundTint="@android:color/white"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#CCCCCC"
-                android:padding="18dp">
+                style="@style/CardStyle"
+                android:layout_marginBottom="20dp">
 
                 <TextView
                     android:id="@+id/tvEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Email:"
-                    android:textSize="22sp"
-                    android:textColor="#424242" />
+                    style="@style/InfoTextStyle"
+                    android:text="Email: "
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"/>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Username Card -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginBottom="200dp"
-                android:backgroundTint="@android:color/white"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="2dp"
-                app:strokeColor="#CCCCCC"
-                android:padding="18dp">
+                style="@style/CardStyle"
+                android:layout_marginBottom="40dp">
 
                 <TextView
                     android:id="@+id/tvUsername"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Username:"
-                    android:textSize="22sp"
-                    android:textColor="#424242" />
+                    style="@style/InfoTextStyle"
+                    android:text="Username: "
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"/>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Sign Out Button -->
@@ -98,12 +79,12 @@
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign Out"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"
+                android:layout_marginTop="260dp"
                 android:backgroundTint="@android:color/holo_red_dark"
-                app:cornerRadius="8dp"
-                android:layout_marginTop="100dp" />
+                android:text="Sign Out"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                app:cornerRadius="8dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

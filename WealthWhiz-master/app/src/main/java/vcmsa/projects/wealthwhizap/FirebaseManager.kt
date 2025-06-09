@@ -11,6 +11,9 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
 import java.io.File
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.SetOptions
+
 
 class FirebaseManager(context: Context? = null) {
     private val db = FirebaseFirestore.getInstance()
@@ -44,11 +47,18 @@ class FirebaseManager(context: Context? = null) {
     }
 
     // Authentication methods
-    suspend fun registerUser(email: String, password: String, firstName: String, username: String): Result<String> {
+    suspend fun registerUser(
+        email: String,
+        password: String,
+        firstName: String,
+        username: String
+    ): Result<String> {
         return try {
             // Create user in Firebase Auth
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val userId = authResult.user?.uid ?: throw Exception("Failed to create user")
+
+            auth.currentUser?.getIdToken(true)?.await()
 
             // Create user document in Firestore
             val userData = hashMapOf(
@@ -58,12 +68,16 @@ class FirebaseManager(context: Context? = null) {
                 "createdAt" to System.currentTimeMillis()
             )
 
+
             usersCollection.document(userId).set(userData).await()
             Result.success(userId)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
+
+
 
     suspend fun loginUser(username: String, password: String): Result<String> {
         return try {
@@ -79,6 +93,9 @@ class FirebaseManager(context: Context? = null) {
 
             // Now login with the email and password
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
+
+            auth.currentUser?.getIdToken(true)?.await()
+
             val userId = authResult.user?.uid ?: throw Exception("Failed to login")
             Result.success(userId)
         } catch (e: Exception) {
@@ -106,9 +123,116 @@ class FirebaseManager(context: Context? = null) {
         }
     }
 
+
+
+    //kiki
+    suspend fun getCurrentStreak(uid: String): Result<Int> {
+        return try {
+            val streak = db.collection("users").document(uid)
+                .get().await()
+                .getLong("loginStreak")?.toInt() ?: 0
+            Result.success(streak)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun signOut() {
         auth.signOut()
     }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // NEW: Update Login Streak On App Open (kiki)
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    suspend fun updateLoginStreakOnAppOpen(uid: String): Result<Long> {
+        return try {
+
+            val userDocRef = db.collection("users").document(uid)
+            val userSnapshot = userDocRef.get().await()
+
+            val lastLoginStr = userSnapshot.getString("lastLoginDate")
+            val loginStreak = userSnapshot.getLong("loginStreak")?.toInt() ?: 0
+
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+            val yesterdayStr = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -1)
+            }.let {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(it.time)
+            }
+
+            val updates = mutableMapOf<String, Any>()
+
+            if (lastLoginStr == null) {
+                // First login
+                updates["loginStreak"] = 1
+                updates["lastLoginDate"] = todayStr
+            } else if (lastLoginStr == yesterdayStr) {
+                // Continue streak
+                updates["loginStreak"] = loginStreak + 1
+                updates["lastLoginDate"] = todayStr
+            } else if (lastLoginStr != todayStr) {
+                // Missed a day, reset streak
+                updates["loginStreak"] = 1
+                updates["lastLoginDate"] = todayStr
+            } // else: already logged in today, do nothing
+
+            if (updates.isNotEmpty()) {
+                userDocRef.update(updates).await()
+            }
+
+
+            // 1) Read existing “lastLogin” & “currentStreak”
+            val snap = userDocRef.get().await()
+            val lastLoginTs = snap.getTimestamp("lastLogin")
+            val oldStreak = snap.getLong("currentStreak") ?: 0L
+
+            // 2) Compute “today” (midnight) & “yesterday” (midnight)
+            val nowCal = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val todayDate = nowCal.time
+
+            val yesterdayCal = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val yesterdayDate = yesterdayCal.time
+
+            // 3) Determine newStreak
+            val newStreak = if (lastLoginTs == null) {
+                1L
+            } else {
+                val lastLoginDate = lastLoginTs.toDate()
+                when {
+                    lastLoginDate == yesterdayDate -> oldStreak + 1
+                    lastLoginDate.before(yesterdayDate) -> 1L
+                    else -> oldStreak
+                }
+            }
+
+            // 4) Write back to Firestore
+            //val updates = mapOf(
+            "lastLogin" to Timestamp.now()
+            "currentStreak" to newStreak
+
+            userDocRef.update(updates).await()
+
+            Result.success(newStreak)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "updateLoginStreakOnAppOpen error", e)
+            Result.failure(e)
+        }
+
+    }
+
+
 
     // Expense methods
     suspend fun saveExpense(expense: Expense): Result<String> {
@@ -243,10 +367,16 @@ class FirebaseManager(context: Context? = null) {
                 }
             }
 
-            Log.d("FirebaseManager", "Found ${expenses.size} expenses for category $categoryId between $startDate and $endDate")
+            Log.d(
+                "FirebaseManager",
+                "Found ${expenses.size} expenses for category $categoryId between $startDate and $endDate"
+            )
             Result.success(expenses)
         } catch (e: Exception) {
-            Log.e("FirebaseManager", "Error getting expenses by category and date range: ${e.message}")
+            Log.e(
+                "FirebaseManager",
+                "Error getting expenses by category and date range: ${e.message}"
+            )
             Result.failure(e)
         }
     }
@@ -283,7 +413,8 @@ class FirebaseManager(context: Context? = null) {
                         userId = doc.getString("userId") ?: return@mapNotNull null,
                         name = doc.getString("name") ?: return@mapNotNull null,
                         iconResId = doc.getLong("iconResId")?.toInt() ?: return@mapNotNull null,
-                        backgroundColor = doc.getString("backgroundColor") ?: return@mapNotNull null,
+                        backgroundColor = doc.getString("backgroundColor")
+                            ?: return@mapNotNull null,
                         budget = doc.getDouble("budget"),
                         subcategory = doc.getString("subcategory"),
                         createdAt = doc.getLong("createdAt") ?: System.currentTimeMillis()
@@ -491,7 +622,8 @@ class FirebaseManager(context: Context? = null) {
             val fileName = "${timestamp}_${randomString}.jpg"
 
             // Get the app's private storage directory
-            val context = context ?: return Result.failure(Exception("Context is required for image save"))
+            val context =
+                context ?: return Result.failure(Exception("Context is required for image save"))
             val imagesDir = File(context.filesDir, "expense_images/$username").apply { mkdirs() }
             val imageFile = File(imagesDir, fileName)
 
@@ -515,7 +647,9 @@ class FirebaseManager(context: Context? = null) {
     suspend fun deleteImage(imageUri: String): Result<Unit> {
         return try {
             // Convert URI string back to File
-            val file = File(Uri.parse(imageUri).path ?: return Result.failure(Exception("Invalid image URI")))
+            val file = File(
+                Uri.parse(imageUri).path ?: return Result.failure(Exception("Invalid image URI"))
+            )
             if (file.exists()) {
                 file.delete()
                 Log.d("FirebaseManager", "Image deleted successfully: $imageUri")
@@ -541,4 +675,20 @@ class FirebaseManager(context: Context? = null) {
             null
         }
     }
+
+
+    companion object {
+        private val db = FirebaseFirestore.getInstance()
+
+        suspend fun getCurrentStreak(uid: String): Result<Int> {
+            return try {
+                val userDoc = db.collection("users").document(uid).get().await()
+                val streak = userDoc.getLong("loginStreak")?.toInt() ?: 0
+                Result.success(streak)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
 }
+

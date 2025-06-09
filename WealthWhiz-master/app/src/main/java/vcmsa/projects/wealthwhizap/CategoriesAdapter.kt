@@ -11,7 +11,8 @@ import com.google.android.material.card.MaterialCardView
 
 class CategoriesAdapter(
     private var categories: List<CategoryEntity>,
-    private val onCategoryClick: (CategoryEntity) -> Unit
+    private val onCategoryClick: (CategoryEntity) -> Unit,
+    private val onCategoryLongClick: (CategoryEntity) -> Unit
 ) : RecyclerView.Adapter<CategoriesAdapter.CategoryViewHolder>() {
 
     class CategoryViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -43,12 +44,12 @@ class CategoriesAdapter(
         holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor(category.backgroundColor))
 
         holder.cardView.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context, CategoryExpensesActivity::class.java).apply {
-                putExtra("CATEGORY_ID", category.id)
-                putExtra("CATEGORY_NAME", category.name)
-            }
-            context.startActivity(intent)
+            onCategoryClick(category)
+        }
+
+        holder.cardView.setOnLongClickListener {
+            onCategoryLongClick(category)
+            true
         }
     }
 

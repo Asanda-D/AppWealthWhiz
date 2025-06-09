@@ -7,59 +7,43 @@
     android:background="#F5F5F5"
     tools:context=".AllExpensesActivity">
 
-    <LinearLayout
-        android:id="@+id/topSection"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical|start"
+        android:background="@android:color/transparent"
+        app:elevation="0dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnClose"
-            android:layout_width="56dp"
-            android:layout_height="52dp"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/close"
-            android:src="@drawable/ic_close" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#F4F6F8"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextAppearance="@style/ToolbarTitleBold" />
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="All Expenses"
-            android:textColor="#000D87"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:visibility="invisible" />
-
-    </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:id="@+id/monthSelectorContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="80dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/bg_month_selector"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topSection">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnPreviousMonth"
@@ -67,20 +51,20 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Previous month"
-                android:src="@drawable/ic_chevron_left"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:src="@drawable/ic_chevron_left" />
 
             <TextView
                 android:id="@+id/tvMonth"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="8dp"
                 android:text="February 2025"
                 android:textAlignment="center"
                 android:textColor="#212121"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:padding="8dp" />
+                android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/btnNextMonth"
@@ -88,24 +72,24 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Next month"
-                android:src="@drawable/ic_chevron_right"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:src="@drawable/ic_chevron_right" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:background="#E1E1E1"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:background="#E1E1E1" />
 
         <View
             android:id="@+id/monthIndicator"
             android:layout_width="0dp"
             android:layout_height="4dp"
-            android:background="#6200EE"
-            android:layout_marginTop="-4dp"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginTop="-4dp"
+            android:layout_marginEnd="8dp"
+            android:background="#6200EE" />
 
     </LinearLayout>
 

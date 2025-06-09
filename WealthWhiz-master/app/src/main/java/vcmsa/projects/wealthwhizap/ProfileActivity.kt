@@ -1,6 +1,7 @@
 package vcmsa.projects.wealthwhizap
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
@@ -28,10 +29,11 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "User Profile"
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = "        \t\t\tUSER PROFILE"
+
 
         tvName = findViewById(R.id.tvName)
         tvEmail = findViewById(R.id.tvEmail)

@@ -5,10 +5,12 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,12 +19,15 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import vcmsa.projects.wealthwhizap.databinding.ActivityAddExpenseBinding
+import vcmsa.projects.wealthwhizap.databinding.ActivityManageCategoriesBinding
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddExpenseActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityAddExpenseBinding
     private lateinit var etAmount: EditText
     private lateinit var spinnerCategory: Spinner
     private lateinit var etSubCategory: EditText
@@ -32,7 +37,7 @@ class AddExpenseActivity : AppCompatActivity() {
     private lateinit var btnPickImage: Button
     private lateinit var imagePreview: ImageView
     private lateinit var btnSaveExpense: Button
-    private lateinit var btnClose: ImageButton
+
 
     private var selectedDateTime: String = ""
     private var selectedImageUri: Uri? = null
@@ -47,7 +52,15 @@ class AddExpenseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_expense)
+        binding = ActivityAddExpenseBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Setup toolbar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = "    \t\t\tADD EXPENSE"
+
 
         etAmount = findViewById(R.id.etAmount)
         spinnerCategory = findViewById(R.id.spinnerCategory)
@@ -58,12 +71,7 @@ class AddExpenseActivity : AppCompatActivity() {
         btnPickImage = findViewById(R.id.btnPickImage)
         imagePreview = findViewById(R.id.imagePreview)
         btnSaveExpense = findViewById(R.id.btnSaveExpense)
-        btnClose = findViewById(R.id.btnClose)
 
-
-        btnClose.setOnClickListener {
-            finish()
-        }
 
         isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
         expenseId = intent.getStringExtra("EXPENSE_ID") ?: ""
@@ -377,6 +385,16 @@ class AddExpenseActivity : AppCompatActivity() {
                 btnSaveExpense.isEnabled = true
                 btnSaveExpense.text = if (isEditMode) "Update Expense" else "Save Expense"
             }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

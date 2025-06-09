@@ -1,5 +1,7 @@
 package vcmsa.projects.wealthwhizap
 
+import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import vcmsa.projects.wealthwhizap.databinding.ActivityManageCategoriesBinding
 
 class ManageCategoriesActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityManageCategoriesBinding
     private lateinit var viewModel: CategoryViewModel
     private lateinit var categoriesAdapter: CategoriesAdapter
@@ -23,7 +26,8 @@ class ManageCategoriesActivity : AppCompatActivity() {
         // Setup toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Manage Categories"
+        binding.toolbar.setTitleTextColor(Color.parseColor("#000D87"))
+        supportActionBar?.title = " \t\t\tMANAGE CATEGORIES"
 
         // Initialize ViewModel
         viewModel = ViewModelProvider(this)[CategoryViewModel::class.java]
@@ -62,9 +66,21 @@ class ManageCategoriesActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        categoriesAdapter = CategoriesAdapter(emptyList()) { category ->
-            startActivity(EditCategoryActivity.newIntent(this, category))
-        }
+        categoriesAdapter = CategoriesAdapter(
+            emptyList(),
+            onCategoryClick = { category ->
+                // Regular click: view expenses
+                val intent = Intent(this, CategoryExpensesActivity::class.java).apply {
+                    putExtra("CATEGORY_ID", category.id)
+                    putExtra("CATEGORY_NAME", category.name)
+                }
+                startActivity(intent)
+            },
+            onCategoryLongClick = { category ->
+                // Long click: edit category
+                startActivity(EditCategoryActivity.newIntent(this, category))
+            }
+        )
 
         binding.rvCategories.apply {
             layoutManager = GridLayoutManager(this@ManageCategoriesActivity, 2)
