@@ -29,10 +29,10 @@ jobs:
         run: chmod +x ./WealthWhiz-master/gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./WealthWhiz-master/gradlew build
 
       - name: Run Debug Unit Tests
-        run: ./gradlew testDebugUnitTest
+        run: ./WealthWhiz-master/gradlew testDebugUnitTest
 
       - name: Upload Test Reports
         if: always()
